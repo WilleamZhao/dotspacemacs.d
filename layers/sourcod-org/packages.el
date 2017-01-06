@@ -96,6 +96,10 @@
   )
 ;;(setq org-clock-modeline-total 'current)
 ;;(setq org-timer-default-timer 25)
+(defun sourcod-org-packages/post-init-org()
+    (progn
+      (require 'ox-publish)
+      ))
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline "~/org-notes/gtd.org" "Workspace")
          "* TODO [#B] %?\n  %i\n"
@@ -140,6 +144,8 @@
           ))))
 
 ;; 发布
+;;(require 'org-publish)
+
 (setq org-publish-project-alist
       '(("org-notes"
          :base-directory "~/org/"
@@ -147,6 +153,7 @@
          :section-numbers nil
          :recursive t
          :publishing-function org-html-publish-to-html
+         ;;org-html-publish-to-html
          :headline-levels 4
          :table-of-contents nil
          :style "<link rel=\"stylesheet\" href=\"css/style.css\"  type=\"text/css\"/>"
@@ -154,10 +161,10 @@
          :author "willeam"
          :email "zhaochunjie@sourcod.com"
          :auto-sitemap t
-         :sitemap-filename "sitemap.org"
-         :sitemap-title "我的wiki"
-         :sitemap-sort-files anti-chronologically
-         :sitemap-file-entry-format "%t" ; %d to output date, we don't need date here
+         ;;:sitemap-filename "sitemap.org"
+         ;;:sitemap-title "我的wiki"
+         ;;:sitemap-sort-files anti-chronologically
+         ;;:sitemap-file-entry-format "%t" ; %d to output date, we don't need date here
          )
         
         ("org-static"
