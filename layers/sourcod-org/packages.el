@@ -107,13 +107,13 @@
         ("n" "notes" entry (file+headline "~/org-notes/notes.org" "Quick notes")
          "* %?\n  %i\n %U"
          :empty-lines 1)
-        ("b" "Blog Ideas" entry (file+headline "~/org-notes/notes.org" "Blog Ideas")
+        ("B" "Blog Ideas" entry (file+headline "~/org-notes/notes.org" "Blog Ideas")
          "* TODO [#B] %?\n  %i\n %U"
          :empty-lines 1)
         ("s" "Code Snippet" entry
          (file "~/org-notes/snippets.org")
          "* %?\t%^g\n#+BEGIN_SRC %^{language}\n\n#+END_SRC")
-        ("w" "work" entry (file+headline "~/org-notes/gtd.org" "Cocos2D-X")
+        ("w" "work" entry (file+headline "~/org-notes/gtd.org" "hituAPP")
          "* TODO [#A] %?\n  %i\n %U"
          :empty-lines 1)
         ("c" "Chrome" entry (file+headline "~/org-notes/notes.org" "Quick notes")
@@ -125,7 +125,11 @@
         ("j" "Journal Entry"
          entry (file+datetree "~/org-notes/journal.org")
          "* %?"
-         :empty-lines 1)))
+         :empty-lines 1)
+        ("b" "Books" entry (file+headline "~/org/books.org" "book notes")
+         "* TODO [#D] %?\n  %i\n %U"
+         :empty-lines 1)
+        ))
 
 (setq org-agenda-custom-commands
       '(
@@ -148,8 +152,8 @@
 
 (setq org-publish-project-alist
       '(("org-notes"
-         :base-directory "~/org/"
-         :publishing-directory "~/org/publish"
+         :base-directory "~/org/blog"
+         :publishing-directory "~/org/blog/publish"
          :section-numbers nil
          :recursive t
          :publishing-function org-html-publish-to-html
@@ -166,15 +170,46 @@
          ;;:sitemap-sort-files anti-chronologically
          ;;:sitemap-file-entry-format "%t" ; %d to output date, we don't need date here
          )
-        
         ("org-static"
-         :base-directory "~/org/"
+         :base-directory "~/org/blog"
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf|doc"
-         :publishing-directory "~/org/publish"
+         :publishing-directory "~/org/blog/publish"
          :recursive t
          :publishing-function org-publish-attachment
          )
         ("org" :components ("org-notes" "org-static"))
-        ))
+
+        ("org-51xny-notes"
+         :base-directory "~/org/blog"
+         :publishing-directory "~/org/blog/publish"
+         :section-numbers nil
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         ;;org-html-publish-to-html
+         :headline-levels 4
+         :table-of-contents nil
+         :style "<link rel=\"stylesheet\" href=\"css/style.css\"  type=\"text/css\"/>"
+         :html-head "<link rel=\"stylesheet\" href=\"css/style.css\"  type=\"text/css\"/>"
+         :author "willeam"
+         :email "zhaochunjie@sourcod.com"
+         :auto-sitemap t
+         ;;:sitemap-filename "sitemap.org"
+         ;;:sitemap-title "我的wiki"
+         ;;:sitemap-sort-files anti-chronologically
+         ;;:sitemap-file-entry-format "%t" ; %d to output date, we don't need date here
+         )
+        ("org-51xny-static"
+         :base-directory "~/org/blog"
+         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf|doc"
+         :publishing-directory "~/org/blog/publish"
+         :recursive t
+         :publishing-function org-publish-attachment
+         )
+        ("org-51xny" :components ("org-51xny-notes" "org-51xny-static"))
+        )
+      
+
+
+      )
 
 ;;; packages.el ends here
