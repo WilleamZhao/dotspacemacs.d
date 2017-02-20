@@ -101,29 +101,31 @@
       (require 'ox-publish)
       ))
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/org-notes/gtd.org" "Workspace")
+      '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Workspace")
          "* TODO [#B] %?\n  %i\n"
          :empty-lines 1)
-        ("n" "notes" entry (file+headline "~/org-notes/notes.org" "Quick notes")
+        ("n" "notes" entry (file+headline "~/org/notes.org" "Quick notes")
          "* %?\n  %i\n %U"
          :empty-lines 1)
-        ("B" "Blog Ideas" entry (file+headline "~/org-notes/notes.org" "Blog Ideas")
+        ("B" "Blog Ideas" entry (file+headline "~/org/notes.org" "Blog Ideas")
          "* TODO [#B] %?\n  %i\n %U"
          :empty-lines 1)
-        ("s" "Code Snippet" entry
-         (file "~/org-notes/snippets.org")
+        ("s" "Code Snippet" entry (file "~/org/snippets.org")
          "* %?\t%^g\n#+BEGIN_SRC %^{language}\n\n#+END_SRC")
-        ("w" "work" entry (file+headline "~/org-notes/gtd.org" "hituAPP")
+        ("h" "hitu" entry (file+headline "~/org/gtd.org" "hitu")
          "* TODO [#A] %?\n  %i\n %U"
          :empty-lines 1)
-        ("c" "Chrome" entry (file+headline "~/org-notes/notes.org" "Quick notes")
+        ("w" "work" entry (file+headline "~/org/gtd.org" "work")
+         "* TODO [#B] %?\n  %i\n %U"
+         :empty-lines 1)
+        ("c" "Chrome" entry (file+headline "~/org/notes.org" "Quick notes")
          "* TODO [#C] %?\n %(sourcod/retrieve-chrome-current-tab-url)\n %i\n %U"
          :empty-lines 1)
-        ("l" "links" entry (file+headline "~/org-notes/notes.org" "Quick notes")
+        ("l" "links" entry (file+headline "~/org/notes.org" "Quick notes")
          "* TODO [#C] %?\n  %i\n %a \n %U"
          :empty-lines 1)
         ("j" "Journal Entry"
-         entry (file+datetree "~/org-notes/journal.org")
+         entry (file+datetree "~/org/journal.org")
          "* %?"
          :empty-lines 1)
         ("b" "Books" entry (file+headline "~/org/books.org" "book notes")
