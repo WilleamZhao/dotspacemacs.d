@@ -121,7 +121,7 @@
         ("c" "Chrome" entry (file+headline "~/org/notes.org" "Quick notes")
          "* TODO [#C] %?\n %(sourcod/retrieve-chrome-current-tab-url)\n %i\n %U"
          :empty-lines 1)
-        ("l" "links" entry (file+headline "~/org/notes.org" "Quick notes")
+        ("l" "links" entry (file+headline "~/org/notes.org" "link notes")
          "* TODO [#C] %?\n  %i\n %a \n %U"
          :empty-lines 1)
         ("j" "Journal Entry"
