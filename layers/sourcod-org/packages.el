@@ -49,14 +49,14 @@
                  :url "http://blog.sourcod.com/xmlrpc.php"
                  :username "sourcod"
                  :default-title "My New Title"
-                 :default-categories ("menu")
+                 :default-categories ("未分类")
                  :tags-as-categories nil)))
         (setq org2blog/wp-default-title "My New Title")
         (setq org2blog/wp-use-tags-as-categories t)
         (setq org2blog/wp-confirm-post t)
         (setq org2blog/wp-use-sourcecode-shortcode t)
         (setq org2blog/wp-sourcecode-default-params "")
-        (setq org2blog/wp-track-posts '("~/blog/blogs.org" "Posts"))
+        (setq org2blog/wp-track-posts '("~/org/sourcod/blogs.org" "Posts"))
         (setq org2blog/wp-sourcecode-langs
               '("actionscript3" "bash" "coldfusion" "cpp" "csharp" "css" "delphi"
                 "erlang" "fsharp" "diff" "groovy" "javascript" "java" "javafx" "matlab"
@@ -115,12 +115,15 @@
         ("h" "hitu" entry (file+headline "~/org/gtd.org" "hitu")
          "* TODO [#A] %?\n  %i\n %U"
          :empty-lines 1)
+        ("c" "wyxny" entry (file+headline "~/org/gtd.org" "wyxny")
+         "* TODO [#B] %?\n  %i\n %U"
+         :empty-lines 1)
         ("w" "work" entry (file+headline "~/org/gtd.org" "work")
          "* TODO [#B] %?\n  %i\n %U"
          :empty-lines 1)
-        ("c" "Chrome" entry (file+headline "~/org/notes.org" "Quick notes")
-         "* TODO [#C] %?\n %(sourcod/retrieve-chrome-current-tab-url)\n %i\n %U"
-         :empty-lines 1)
+        ;;("c" "Chrome" entry (file+headline "~/org/notes.org" "Quick notes")
+         ;;"* TODO [#C] %?\n %(sourcod/retrieve-chrome-current-tab-url)\n %i\n %U"
+         ;;:empty-lines 1)
         ("l" "links" entry (file+headline "~/org/notes.org" "Quick notes")
          "* TODO [#C] %?\n  %i\n %a \n %U"
          :empty-lines 1)

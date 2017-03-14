@@ -30,33 +30,73 @@
 ;;; Code:
 
 (defconst sourcod-email-packages
-  '(mu4e)
-  "The list of Lisp packages required by the sourcod-email layer.
+  '(
+    mu4e
+    gnus
+    )
+  )
 
-Each entry is either:
+;;; Set up some common mu4e variables
+(defun sourcod-email/init-mu4e()
+  (use-package mu4e)
+  )
+(defun sourcod-email/init-gnus()
+  (use-package gnus)
+  )
 
-1. A symbol, which is interpreted as a package to be installed, or
 
-2. A list of the form (PACKAGE KEYS...), where PACKAGE is the
-    name of the package to be installed or loaded, and KEYS are
-    any number of keyword-value-pairs.
 
-    The following keys are accepted:
+(setq mu4e-maildir "~/mail"
+      mu4e-drafts-folder "/Drafts"
+      mu4e-sent-folder   "/Sent Messages"
+      mu4e-refile-folder "/Archive"
+      mu4e-trash-folder "/Deleted Messages"
+      mu4e-get-mail-command "mbsync -a"
+      mu4e-update-interval nil
+      mu4e-compose-signature-auto-include nil
+      mu4e-view-show-images t
+      mu4e-view-show-addresses t)
+    ;;; Mail directory shortcuts
+(setq mu4e-maildir-shortcuts
+      '(("/INBOX" . ?i)
+        ("/Sent Messages" . ?s)
+        ("/Junk" . ?j)
+        ("/Deleted Messages" . ?d)
+        ))
 
-    - :excluded (t or nil): Prevent the package from being loaded
-      if value is non-nil
+(setq mu4e-get-mail-command "offlineimap")
 
-    - :location: Specify a custom installation location.
-      The following values are legal:
+;; something about ourselves
+(setq user-mail-address "dean-chen@qq.com"
+      user-full-name  "Dean Chen"
+      mu4e-compose-signature
+      (concat
+       "Dean Chen\n"
+       "Email: dean-chen@qq.com\n"
+       "Blog: blog.csdn.net/csfreebird\n"
+       "\n")
+      mu4e-compose-signature-auto-include t
+      )
 
-      - The symbol `elpa' (default) means PACKAGE will be
-        installed using the Emacs package manager.
+;;send mail
+(require 'smtpmail)
+(setq message-send-mail-function 'smtpmail-send-it
+      smtpmail-stream-type 'starttls
+      smtpmail-default-smtp-server "smtp.qq.com"
+      smtpmail-smtp-server "smtp.qq.com"
+      smtpmail-smtp-service 587)
 
-      - The symbol `local' directs Spacemacs to load the file at
-        `./local/PACKAGE/PACKAGE.el'
+(setq mu4e-view-show-images t)
 
-      - A list beginning with the symbol `recipe' is a melpa
-        recipe.  See: https://github.com/milkypostman/melpa#recipe-format")
+;; save attachment to my desktop (this can also be a function)
+(setq mu4e-attachment-dir "~/Downloads")
+
+;; sync email from imap server
+(setq mu4e-get-mail-command "offlineimap"
+      mu4e-update-interval 300)
+;; notifcation
+(setq mu4e-enable-notifications t)
+;;(mu4e-alert-enable-mode-line-display)
 
 
 ;;; packages.el ends here
