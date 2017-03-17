@@ -37,12 +37,12 @@
   )
 
 ;;; Set up some common mu4e variables
-(defun sourcod-email/init-mu4e()
-  (use-package mu4e)
-  )
-(defun sourcod-email/init-gnus()
-  (use-package gnus)
-  )
+;;(defun sourcod-email/init-mu4e()
+;;  (use-package mu4e)
+;;  )
+;;(defun sourcod-email/init-gnus()
+;;  (use-package gnus)
+;;  )
 
 
 
