@@ -149,6 +149,12 @@
           (tags-todo "PROJECT") ;; review all projects (assuming you use todo keywords to designate projects)
           ))))
 
+(setq org-agenda-files (list "~/org/gtd.org"
+                             "~/org/notes.org"
+                             "~/org/books.org"
+                             "~/org/journal.org"
+                             ))
+
 ;; 发布
 ;;(require 'org-publish)
 
