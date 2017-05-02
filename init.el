@@ -68,12 +68,11 @@ values."
      syntax-checking
      version-control
      sourcod-org
-     sourcod-email
-     ;;me4u
-     ;;gnus
+     ;;sourcod-email
+     mu4e
+     gnus
      sourcod-hexo
      sourcod-blog
-     ;; sourcod-email
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -157,8 +156,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 14
+   dotspacemacs-default-font '("Menlo"
+                               :size 10
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -342,6 +341,98 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+
+  ;;mu4e
+  (setq mu4e-maildir "~/mail"
+        mu4e-drafts-folder "/Drafts"
+        mu4e-sent-folder   "/Sent Messages"
+        mu4e-refile-folder "/Archive"
+        mu4e-trash-folder "/Deleted Messages"
+        mu4e-get-mail-command "mbsync -a"
+        mu4e-update-interval nil
+        mu4e-compose-signature-auto-include nil
+        mu4e-view-show-images t
+        mu4e-view-show-addresses t)
+    ;;; Mail directory shortcuts
+  (setq mu4e-maildir-shortcuts
+        '(("/INBOX" . ?i)
+          ("/Sent Messages" . ?s)
+          ("/Junk" . ?j)
+          ("/Deleted Messages" . ?d)
+          ))
+
+  (setq mu4e-get-mail-command "fetchmail")
+
+  ;; something about ourselves
+  (setq user-mail-address "zhaochunjie.love@163.com"
+        user-full-name  "willeamZhao"
+        mu4e-compose-signature
+        (concat
+         "willeamZhao\n"
+         "Email: zhaochunjie@sourcod.com\n"
+         "Blog: blog.sourcod.com\n"
+         "\n")
+        mu4e-compose-signature-auto-include t
+        )
+
+  ;;send mail
+  (require 'smtpmail)
+  (setq message-send-mail-function 'smtpmail-send-it
+        smtpmail-stream-type 'starttls
+        smtpmail-default-smtp-server "smtp.qq.com"
+        smtpmail-smtp-server "smtp.qq.com"
+        smtpmail-smtp-service 587)
+
+  (setq mu4e-view-show-images t)
+
+  ;; save attachment to my desktop (this can also be a function)
+  (setq mu4e-attachment-dir "~/Downloads")
+
+  ;; sync email from imap server
+  (setq mu4e-get-mail-command "offlineimap"
+        mu4e-update-interval 300)
+  ;; notifcation
+  (setq mu4e-enable-notifications t)
+  ;;(mu4e-alert-enable-mode-line-display)
+
+
+  ;; gnus
+  (setq user-mail-address "zhaochunjie@sourcod.com"
+        user-full-name "zhaochunjie")
+  (setq gnus-select-method
+        '(nnimap "aliyun"
+                 (nnimap-address "imap.mxhichina.com")  ; it could also be imap.googlemail.com if that's your server.
+                 (nnimap-server-port "imaps")
+                 (nnimap-stream ssl)))
+
+  (setq smtpmail-smtp-server "imap.mxhichina.com"
+        smtpmail-smtp-service 587
+        gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+
+
+  ;; set email reader
+  (setq gnus-secondary-select-methods '((nnml "")))
+
+  ;; set pop server
+  (setq mail-sources
+        '((pop :server "pop3.mxhichina.com"   ;; 在这里设置 pop3 服务器
+               :user "zhaochunjie@sourcod.com"     ;; 用户名
+               :port 995
+               :password "sourcodp@ssw0rd"   ;; 密码
+               :stream ssl)))
+
+  ;; set smtp
+  (setq smtpmail-auth-credentials
+        '(("smtp.mxhichina.com"                ;; SMTP 服务器
+           25                                   ;; 端口号
+           "zhaochunjie@sourcod.com"                 ;; 用户名
+           "sourcodp@ssw0rd")))       ;; 密码
+
+  (setq smtpmail-default-smtp-server "smtp.mxhichina.com")
+  (setq smtpmail-smtp-server "smtp.mxhichina.com")
+  (setq message-send-mail-function 'smtpmail-send-it)
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -373,7 +464,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yaml-mode blog-admin ctable hexo pangu-spacing org2blog metaweblog xml-rpc magit-gh-pulls github-search github-clone magit-popup git-commit with-editor dash github-browse-file gist gh marshal logito pcache ht flycheck-pos-tip flycheck find-by-pinyin-dired fcitx engine-mode chinese-pyim chinese-pyim-basedict pos-tip ace-pinyin pinyinlib ace-jump-mode youdao-dictionary xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tagedit spacemacs-theme spaceline smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs rainbow-delimiters quelpa pug-mode popwin persp-mode pcre2el paradox orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file neotree mwim multi-term move-text mmm-mode markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md flyspell-correct-helm flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav dumb-jump diff-hl define-word company-web company-tern company-statistics column-enforce-mode coffee-mode clean-aindent-mode auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+    (org-mac-link mu4e-maildirs-extension mu4e-alert chinese-word-at-point winum unfill powerline spinner alert log4e gntp markdown-mode hydra parent-mode projectile request haml-mode gitignore-mode fringe-helper git-gutter+ git-gutter fuzzy flyspell-correct pkg-info epl flx magit smartparens iedit anzu evil goto-chg undo-tree highlight diminish web-completion-data company names bind-map bind-key yasnippet packed helm avy helm-core async auto-complete popup yaml-mode blog-admin ctable hexo pangu-spacing org2blog metaweblog xml-rpc magit-gh-pulls github-search github-clone magit-popup git-commit with-editor dash github-browse-file gist gh marshal logito pcache ht flycheck-pos-tip flycheck find-by-pinyin-dired fcitx engine-mode chinese-pyim chinese-pyim-basedict pos-tip ace-pinyin pinyinlib ace-jump-mode youdao-dictionary xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tagedit spacemacs-theme spaceline smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs rainbow-delimiters quelpa pug-mode popwin persp-mode pcre2el paradox orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file neotree mwim multi-term move-text mmm-mode markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md flyspell-correct-helm flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav dumb-jump diff-hl define-word company-web company-tern company-statistics column-enforce-mode coffee-mode clean-aindent-mode auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
  '(send-mail-function (quote mailclient-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

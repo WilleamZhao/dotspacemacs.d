@@ -46,7 +46,7 @@
       ;; Open post after create new post
       (add-hook 'blog-admin-backend-after-new-post-hook 'find-file)
       ;; Hexo
-      (setq blog-admin-backend-path "~/sourcod-blog/")
+      (setq blog-admin-backend-path "~/workspace/hexo/sourcod-blog/")
       (setq blog-admin-backend-type 'hexo)
       ;; create new post in drafts by default
       (setq blog-admin-backend-new-post-in-drafts t)
