@@ -47,11 +47,11 @@
 
 
 (setq mu4e-maildir "~/mail"
-      mu4e-drafts-folder "/Drafts"
-      mu4e-sent-folder   "/Sent Messages"
-      mu4e-refile-folder "/Archive"
-      mu4e-trash-folder "/Deleted Messages"
-      mu4e-get-mail-command "mbsync -a"
+      ;;mu4e-drafts-folder "/Drafts"
+      ;;mu4e-sent-folder   "/Sent Messages"
+      ;;mu4e-refile-folder "/Archive"
+      ;;mu4e-trash-folder "/Deleted Messages"
+      mu4e-get-mail-command "fetchmail"
       mu4e-update-interval nil
       mu4e-compose-signature-auto-include nil
       mu4e-view-show-images t
@@ -64,7 +64,7 @@
         ("/Deleted Messages" . ?d)
         ))
 
-(setq mu4e-get-mail-command "offlineimap")
+(setq mu4e-get-mail-command "fetchmail")
 
 ;; something about ourselves
 ;;(setq user-mail-address "dean-chen@qq.com"
@@ -89,10 +89,10 @@
 (setq mu4e-view-show-images t)
 
 ;; save attachment to my desktop (this can also be a function)
-(setq mu4e-attachment-dir "~/Downloads")
+(setq mu4e-attachment-dir "~/mail")
 
 ;; sync email from imap server
-(setq mu4e-get-mail-command "offlineimap"
+(setq mu4e-get-mail-command "fetchmail"
       mu4e-update-interval 300)
 ;; notifcation
 (setq mu4e-enable-notifications t)
