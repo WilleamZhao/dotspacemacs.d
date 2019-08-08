@@ -39,7 +39,7 @@
 
 (defun hexo-my-blog ()
   (interactive)
-  (hexo "~/sourcod-blog/")
+  (hexo "~/workspace/hexo/sourcod-blog/")
   ;;((nil . ((hexo-new-format . org))
   ;;))
 )

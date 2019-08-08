@@ -141,7 +141,7 @@
       (require 'ox-publish)
       ))
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Workspace")
+      '(("t" "Todo" entry (file+headline "~/org/gtd.org" "GTD")
          "* TODO [#B] %?\n  %i\n"
          :empty-lines 1)
         ("n" "notes" entry (file+headline "~/org/notes.org" "Quick notes")
@@ -155,7 +155,7 @@
         ("h" "hitu" entry (file+headline "~/org/gtd.org" "hitu")
          "* TODO [#A] %?\n  %i\n %U"
          :empty-lines 1)
-        ("c" "wyxny" entry (file+headline "~/org/gtd.org" "wyxny")
+        ("k" "tlkj" entry (file+headline "~/org/gtd.org" "tlkj")
          "* TODO [#B] %?\n  %i\n %U"
          :empty-lines 1)
         ("w" "work" entry (file+headline "~/org/gtd.org" "work")
@@ -193,6 +193,7 @@
                              "~/org/notes.org"
                              "~/org/books.org"
                              "~/org/journal.org"
+                             "~/org/xnyxny/gtd.org"
                              ))
 
 ;; 发布

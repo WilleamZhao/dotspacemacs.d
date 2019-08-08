@@ -13,7 +13,7 @@
   (setq fullpath
         ;; (file-name-directory (buffer-file-name)
         (concat
-         (expand-file-name "~/ownCloud/pictures/blog/")
+         (expand-file-name "~/Pictures/hexo/")
          (file-name-base (buffer-file-name))
          "_"
          basename))
@@ -45,7 +45,7 @@
   (setq fullpath
         ;; (file-name-directory (buffer-file-name)
         (concat
-         (expand-file-name "~/ownCloud/pictures/blog/")
+         (expand-file-name "~/Pictures/hexo/")
          (file-name-base (buffer-file-name))
          "_"
          basename))
