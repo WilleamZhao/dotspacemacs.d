@@ -1,4 +1,3 @@
-;; -*- mode: emacs-lisp -*-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
@@ -31,6 +30,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     ;; (plantuml :variables plantuml-jar-path "~/.spacemacs.d/plantuml.jar")
      php
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
@@ -38,7 +38,15 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      osx
-     javascript
+
+     ;; coding 时间统计
+     (wakatime :variables
+               wakatime-api-key  "47278ced-f745-4e75-8cda-194f0ee43565"
+               ;; use the actual wakatime path
+               wakatime-cli-path "/usr/local/bin/wakatime")
+
+     (javascript :variables
+                 javascript-disable-tern-port-files nil)
      yaml
      html
      helm
@@ -54,30 +62,58 @@ values."
           magit-revert-buffers 'silent
           magit-refs-show-commit-count 'all
           magit-revision-show-gravatars nil)
-     markdown
+
+     (markdown :variables markdown-live-preview-engine 'vmd)
+
      org
-     colors
+     (colors :variables
+             colors-enable-nyan-cat-progress-bar nil)
+
+     themes-megapack
+
+     games
+     restclient
+     chrome
+     ;; search-engine
+
+     (erc :variables
+          erc-server-list
+          '(("irc.freenode.net"
+             :port "6697"
+             :ssl t
+             :nick "sourcod"
+             :password "sourcodp@ssw0rd")
+            ("irc.myworkirc.net"
+             :port "1234"
+             :nick "sourcod"
+             :password "sourcodp@ssw0rd")
+            ("chat.freenode.net"
+             :port "6697"
+             :nick "sourcod"
+             :password "sourcodp@ssw0rd")
+
+            ))
 
      ;; spaceline-compile
      ;; blog-admin
-     
-     ;;(chinese :variables
-     ;;         chinese-enable-avy-pinyin nil
-     ;;         chinese-enable-youdao-dict t
-     ;;         chinese-enable-fcitx t
-     ;;         chinese-pyim t
-     ;;         chinese-default-input-method 'pinyin
-     ;;         )
+     (chinese :variables
+              chinese-default-input-method 'wubi
+              chinese-enable-youdao-dict t
+              )
+
+     gtags
+     nginx
      (shell :variables
+            shell-default-shell 'eshell
             shell-default-height 30
             shell-default-position 'bottom)
-     spell-checking
+     ;; spell-checking
      syntax-checking
      version-control
-     sourcod-org
+     ;; sourcod-org
      ;;sourcod-email
      mu4e
-     gnus
+     ;; gnus
      sourcod-hexo
      sourcod-blog
      )
@@ -85,7 +121,9 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(
+                                      cnfonts
+                                      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -141,7 +179,7 @@ values."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'official
+   dotspacemacs-startup-banner 'random
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
@@ -160,8 +198,10 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(tango-dark
-
+   dotspacemacs-themes '(monokai
+                         darkokai
+                         tango-dark
+                         gruvbox
                          leuven
                          zenburn
                          spacemacs-dark
@@ -171,7 +211,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
+                               :size 16
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -352,6 +392,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (set-buffer-file-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8)
   (modify-coding-system-alist 'process "*" 'utf-8)
+
+  ;; magit
+  (setq-default git-magit-status-fullscreen t)
+  (setq-default git-enable-magit-svn-plugin t)
   ;; (setq-default dotspacemacs-themes '(solarized-light leuven zenburn))
   )
 
@@ -362,17 +406,443 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  (spaceline-compile)
+  ;; chrome
+  (add-hook 'edit-server-start-hook 'markdown-mode)
+  (add-hook 'edit-server-done-hook (lambda () (shell-command "open -a \"Google Chrome\"")))
+  (add-to-list 'edit-server-new-frame-alist '(width  . 140))
+  (add-to-list 'edit-server-new-frame-alist '(height . 60))
+  (setq edit-server-url-major-mode-alist
+              '(("github\\.com" . org-mode)))
+  ;; Search Engine
+  ;;(setq browse-url-browser-function 'browse-url-generic
+    ;;    engine/browser-function 'browse-url-generic
+      ;;  browse-url-generic-program "google-chrome")
+
+  ;; neotree
+  (setq projectile-switch-project-action 'neotree-projectile-action)
+  (setq neo-show-hidden-files nil)
+  (setq neo-smart-open t)
+  (global-set-key [f2] 'neotree-toggle)
+
+  (defun neotree-ffip-project-dir ()
+    "Open NeoTree using the git root."
+    (interactive)
+    (let ((project-dir (ffip-project-root))
+          (file-name (buffer-file-name)))
+      (if project-dir
+          (progn
+            (neotree-dir project-dir)
+            (neotree-find file-name))
+        (message "Could not find git project root."))))
+
+  ;; time-mode
+  (setq display-time-24hr-format t
+        ;; display-time-format "%d | %H:%M"
+        ;; display-time-day-and-date t
+        ;; display-time-interval 60
+        display-time-default-load-average nil)
+  (display-time-mode)
+
+
+
+  ;; projectile
+  ;; Shorter modeline
+  (setq-default projectile-mode-line-prefix " Proj")
+  (global-set-key (kbd "C-c C-p") 'projectile-switch-project)
+
+  ;; magit
+  (setq magit-repository-directories '("~/.spacemacs.d/repos/magit/"))
+  (global-git-commit-mode t)
+
+  (custom-set-faces
+   '(mode-line ((t (:foreground "#fff" :background "#444" :box nil))))
+   '(mode-line-inactive ((t (:foreground "#d0d0d0" :background "#666666" :box nil)))))
+  (setq powerline-color1 "grey22")
+  (setq powerline-color2 "grey40")
+
+
+  ;; 设置bullet list
+  (setq org-bullets-bullet-list '("☰" "☷" "☯" "☭"))
+
+  ;; 调试好久的颜色，效果超赞！ todo keywords 增加背景色
+  (setf org-todo-keyword-faces '(("TODO" . (:foreground "white" :background "#95A5A6"   :weight bold))
+                                 ("HAND" . (:foreground "white" :background "#2E8B57"  :weight bold))
+                                 ("DONE" . (:foreground "white" :background "#3498DB" :weight bold))))
+
+  ;; 等宽字体
+  ;;解决org表格里面中英文对齐的问题
+  ;;(when (configuration-layer/layer-usedp 'chinese)
+  ;;(when (and (spacemacs/system-is-mac) window-system)
+  ;;(spacemacs//set-monospaced-font "Source Code Pro" "Hiragino Sans GB" 14 16)))
+
+  ;; org
+  ;; 多状态工作流程
+  (setq org-todo-keywords
+        (quote ((sequence "TODO(t)" "NEXT(n)" "WAITING(w)" "MAYBE(m)" "|" "DONE(d!/!)" "ABORT(a@/!)")
+                (sequence "PROJECT(p)" "|" "DONE(d!/!)" "CANCELLED(c@/!)")
+                (sequence "WAITING(w@/!)" "DELEGATED(e!)" "HOLD(h)" "|" "CANCELLED(c@/!)")))
+        org-todo-repeat-to-state "NEXT")
+
+  ;; 改变状态触发标签变化
+  (setq org-todo-state-tags-triggers
+        (quote (("CANCELLED" ("HOLD") ("WAITING") ("CANCELLED" . t))
+                ("WAITING" ("HOLD") ("CANCELLED") ("WAITING" . t))
+                ("HOLD" ("WAITING") ("CANCELLED") ("HOLD" . t))
+                (done ("WAITING") ("HOLD"))
+                ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+                ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+                ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+  (setq org-todo-keyword-faces
+        (quote (("TODO" :foreground "red" :weight bold)
+
+                ("NEXT" :foreground "blue" :weight bold)
+                ("DONE" :foreground "forest green" :weight bold)
+                ("WAITING" :foreground "orange" :weight bold)
+                ("HOLD" :foreground "magenta" :weight bold)
+                ("CANCELLED" :foreground "forest green" :weight bold)
+                ("MAYBE" :foreground "grey" :weight bold)
+
+                ("MEETING" :foreground "forest green" :weight bold)
+                ("PHONE" :foreground "forest green" :weight bold)
+                ("PROJECT" :inherit font-lock-string-face)
+
+                )))
+
+  (defconst leuven-org-completed-date-regexp
+    (concat " \\("
+            "CLOSED: \\[%Y-%m-%d"
+            "\\|"
+            "- State \"\\(DONE\\|CANX\\)\" * from .* \\[%Y-%m-%d"
+            "\\|"
+            "- State .* ->  *\"\\(DONE\\|CANX\\)\" * \\[%Y-%m-%d"
+            "\\) ")
+    "Matches any completion time stamp.")
+  (setq-default
+   ;; inhibit-startup-screen t;隐藏启动显示画面
+   calendar-date-style 'iso
+   ;; calendar-day-abbrev-array ["七" "一" "二" "三" "四" "五" "六"]
+   ;; calendar-day-name-array ["七" "一" "二" "三" "四" "五" "六"]
+   ;; calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"]
+   calendar-week-start-day 1
+
+   org-agenda-deadline-leaders (quote ("最后期限:  " "%3d 天后到期: " "%2d 天前: "))
+   org-agenda-inhibit-startup t
+   org-agenda-scheduled-leaders (quote ("计划任务:" "计划任务(第%2d次激活): "))
+   org-agenda-window-setup (quote current-window)
+   ;; org-clock-string "计时:"
+   ;; org-closed-string "已关闭:"
+   ;; org-deadline-string "最后期限:"
+   ;; org-scheduled-string "计划任务:"
+   ;; org-time-stamp-formats  '("<%Y-%m-%d 周%u>" . "<%Y-%m-%d 周%u %H:%M>")
+   org-agenda-show-all-dates t
+   org-agenda-skip-deadline-if-done t
+   org-agenda-skip-scheduled-if-done t
+   org-reverse-note-order t ;;org.el
+   org-link-file-path-type  'relative
+   org-log-done 'time
+   ;; code执行免应答（Eval code without confirm）
+   org-confirm-babel-evaluate nil
+   org-image-actual-width '(600)
+   org-emphasis-regexp-components
+   ;; markup 记号前后允许中文
+   ;; https://emacs-china.org/t/org-mode/597/11
+   ;; Org 里中文/斜体/、*粗体*、_下划线_、+删除+、~代码~、=常量=。
+   (list (concat " \t('\"{"            "[:nonascii:]")
+         (concat "- \t.,:!?;'\")}\\["  "[:nonascii:]")
+         " \t\r\n,\"'"
+         "."
+         1)
+   )
+
+  (setq org-pomodoro-keep-killed-pomodoro-time t)
+  ;; (define-key org-agenda-mode-map (kdb "P" 'org-pomodoro))
+  (setq org-agenda-prefix-format
+        '((agenda  . " %i %-10:c%?-12t% s")
+          (timeline  . "  % s")
+          (todo  . " %i %-12:c")
+          (tags  . " %i %-12:c")
+          (search . " %i %-12:c"))
+        )
+
+  ;; 优先级范围和默认任务的优先级
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority  ?D)
+  (setq org-default-priority ?B)
+
+
+  ;; 优先级醒目外观
+  (setq org-priority-faces
+        '((?A . (:weight bold))
+          (?B . (:weight bold))
+          (?C . (:weight bold))
+          (?D . (:weight bold))
+          ))
+
+  ;; tags
+  ;; @代表动作/情景
+  (setq org-tag-alist '(
+                        ;; 小写动作/大写项目
+                        ;; 工作
+                        ("@Office" . ?o)
+                        ;; 将来/也许
+                        ("@Maybe" . ?m)
+                        ;; 会议/开会
+                        ("@Meeting" . ?M)
+                        ;; 任何时候
+                        ("@Anywhere" .?A)
+                        ;; 电话
+                        ("@Phone" . ?p)
+                        ;; 电脑前/用电脑
+                        ("@Computer". ?c)
+                        ;; 出差
+                        ("@Errands" . ?e)
+                        ;; 家里
+                        ("@Home" . ?h)
+                        ;; 购物
+                        ("@Shopping" . ?s)
+                        ))
+
+  (setq org-path "/Users/sourcod/workspace/org/")
+  (setq org-note-path  (concat org-path "notes/"))
+
+
+  (setq org-default-notes-file (concat org-path "notes.org"))
+
+  ;; billing
+  (defun get-year-and-month ()
+    (list (format-time-string "%Y年") (format-time-string "%m月")))
+
+
+  (defun find-month-tree ()
+    (let* ((path (get-year-and-month))
+           (level 1)
+           end)
+      (unless (derived-mode-p 'org-mode)
+        (error "Target buffer \"%s\" should be in Org mode" (current-buffer)))
+      (goto-char (point-min))             ;移动到 buffer 的开始位置
+      ;; 先定位表示年份的 headline，再定位表示月份的 headline
+      (dolist (heading path)
+        (let ((re (format org-complex-heading-regexp-format
+                          (regexp-quote heading)))
+              (cnt 0))
+          (if (re-search-forward re end t)
+              (goto-char (point-at-bol))  ;如果找到了 headline 就移动到对应的位置
+            (progn                        ;否则就新建一个 headline
+              (or (bolp) (insert "\n"))
+              (if (/= (point) (point-min)) (org-end-of-subtree t t))
+              (insert (make-string level ?*) " " heading "\n"))))
+        (setq level (1+ level))
+        (setq end (save-excursion (org-end-of-subtree t t))))
+      (org-end-of-subtree)))
+
+  ;; protocol
+  (require 'org-protocol)
+
+  ;; dynamic href
+  (setq org-capture-templates
+        `(("c" "Contacts" table-line (file ,(concat org-path "contact.org"))
+           "| %U | %^{姓名} | %^{主手机号} | %^{次手机号} | %^{邮箱} | %^{公司} | %^{标签} | %^{备注} | %^{生日} |")
+          ("t" "Inbox" entry (file+headline ,(concat org-path "gtd/inbox.org") "Inbox")
+           "* TODO [#B] %?\n  %i\n"
+           :empty-lines 1
+           )
+          ;; 临时笔记
+          ("n" "notes")
+          ("nc" "名言警句" entry (file+headline ,(concat org-path "notes.org") "catchphrase")
+           "* %?\n  %i\n %U"
+           :empty-lines 1
+           )
+          ("nn" "Quick notes" entry (file+headline ,(concat org-path "notes.org") "Quick notes")
+           "* %?\n  %i\n %U"
+           :empty-lines 1
+           )
+
+          ;; 会议笔记
+          ("nm" "Meeting" entry (file+headline ,(concat org-path "notes.org") "Meeting")
+           "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+
+          ;; 记账
+          ("i" "记账" table-line (file+datetree+prompt ,(concat org-path "billing.org"))
+           "| %U | %^{类别} | %^{描述} | %^{金额} | " :kill-buffer t
+           :empty-lines 1
+           )
+
+          ("ni" "idea" entry (file+headline ,(concat org-path "notes.org") "idea")
+           "*  %?\n  %i\n %U"
+           :empty-lines 1
+           )
+
+          ;; blog
+          ("B" "create blog" plain (file ,(concat org-path "blog/" (format-time-string "%Y-%m-%d.org")))
+           ,(concat "#+TITLE: %^{标题}\n"
+                    "#+TAGS: %^{标签}\n"
+                    "#+SETUPFILE: index.org\n"
+                    "#+EMAIL: zhaochunjie@sourcod.com\n"
+                    "#+AUTHOR: willeam\n"
+                    "#+HTML: <div class=outline-2 id=\"meta\">\n"
+                    "| Author | {{{author}}} ({{{email}}})    |\n"
+                    "| Date   | {{{time(%Y-%m-%d %H:%ML%S)}}} |\n"
+                    "#+HTML: </div>\n"
+                    "#+options: ^:{}\n"
+                    "#+options: \\n:t\n"
+                    "#+TOC: headlines 3\n")
+           )
+
+          ;; 代码片段
+          ("s" "Code Snippet" entry (file ,(concat org-path "snippets.org"))
+           "* %?\t%^g\n#+BEGIN_SRC %^{language}\n\n#+END_SRC")
+          ;; 工作
+          ("w" "work" entry (file+headline ,(concat org-path "inbox.org") "work")
+           "* TODO [#B] %?\n  %i\n %U"
+           :empty-lines 1)
+          ;; 连接收藏夹
+          ("l" "links" entry (file ,(concat org-path "link.org"))
+           "* TODO [#C] %?\n  %i\n %a \n %U"
+           :empty-lines 1)
+          ;; 日记
+          ("j" "Journal Entry"
+           entry (file+datetree ,(concat org-path "journal.org"))
+           "* %U | 标题 -> %^{标题} | 天气 -> %^{天气} | 心情 -> %^{心情}\n%?"
+           :empty-lines 1
+           )
+          ;; 书
+          ("b" "Books" entry (file+headline ,(concat org-path "books.org") "book notes")
+           "* TODO [#D] %?\n  %i\n %U"
+           :empty-lines 1)
+
+          ;; protocol
+
+          ;; projects
+          ;; ("p" "projects")
+          ;; ;; 天蓝科技
+          ;; ("pt" "天蓝科技")
+          ;; ("pt1" "zdqdp" entry (file+olp ,(concat org-path "project.org") "天蓝科技" "自动抢订票")
+          ;;  "* TODO [#D] %?")
+
+          ;; ("pz" "自己")
+          ;; ("pz1" "WXBootstrap" entry (file+olp ,(concat org-path "project.org") "my" "WXBootstrap")
+          ;;  "* TODO [#D] %?")
+
+
+          ;; ("pw" "外部")
+          ;; ("pw2" "富胜科技" entry (file+olp ,(concat org-path "project.org") "富胜科技") "* TODO [D] %?")
+
+          ;; ("pw1" "古联")
+          ;; ;; gulian
+          ;; ("pw11" "gulian-app" entry (file+olp ,(concat org-path "project.org") "gulian" "app")
+          ;;  "* TODO [#D] %?")
+          ;; ;; gulian
+          ;; ("pw12" "gulian-wx" entry (file+olp ,(concat org-path "project.org") "gulian" "wx")
+          ;;  "* TODO [#D] %?")
+
+
+          ("P" "Password" entry (file ,(concat org-path "password.org.cpt"))
+           "* %U - %^{title} %^G\n\n  - 用户名: %^{用户名}\n  - 密码: %(get-or-create-password)"
+           :empty-lines 1
+           :kill-buffer t
+           )
+          )
+
+        )
+
+;;; Archiving 归档
+  ;; C-c C-x C-a
+  (setq org-archive-mark-done nil)
+
+  (setq org-archive-location
+        (concat org-path "gtd/finished.org::* From %s")
+        )
+
+  ;; 发布
+  ;;(require 'org-publish)
+
+  (setq org-publish-project-alist
+        '(("org-notes"
+           :base-directory "~/workspace/org/blog"
+           :publishing-directory "~/workspace/org/blog/publish"
+           :section-numbers nil
+           :recursive t
+           :publishing-function org-html-publish-to-html
+           ;;org-html-publish-to-html
+           :headline-levels 4
+           :table-of-contents nil
+           :style "<link rel=\"stylesheet\" href=\"css/style.css\"  type=\"text/css\"/>"
+           :html-head "<link rel=\"stylesheet\" href=\"css/style.css\"  type=\"text/css\"/>"
+           :author "willeam"
+           :email "zhaochunjie@sourcod.com"
+           :auto-sitemap t
+           ;;:sitemap-filename "sitemap.org"
+           ;;:sitemap-title "我的wiki"
+           ;;:sitemap-sort-files anti-chronologically
+           ;;:sitemap-file-entry-format "%t" ; %d to output date, we don't need date here
+           )
+          ("org-static"
+           :base-directory "~/workspace/org/blog"
+           :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf|doc"
+           :publishing-directory "~/workspace/org/blog/publish"
+           :recursive t
+           :publishing-function org-publish-attachment
+           )
+          ("org" :components ("org-notes" "org-static"))
+
+          ;;
+          ;;("org-51xny-notes"
+          ;; :base-directory "~/workspace/org/blog"
+          ;; :publishing-directory "~/workspace/org/blog/publish"
+          ;; :section-numbers nil
+          ;; :recursive t
+          ;; :publishing-function org-html-publish-to-html
+          ;; ;;org-html-publish-to-html
+          ;; :headline-levels 4
+          ;; :table-of-contents nil
+          ;; :style "<link rel=\"stylesheet\" href=\"css/style.css\"  type=\"text/css\"/>"
+          ;; :html-head "<link rel=\"stylesheet\" href=\"css/style.css\"  type=\"text/css\"/>"
+          ;; :author "willeam"
+          ;; :email "zhaochunjie@sourcod.com"
+          ;; :auto-sitemap t
+          ;; ;;:sitemap-filename "sitemap.org"
+          ;; ;;:sitemap-title "我的wiki"
+          ;; ;;:sitemap-sort-files anti-chronologically
+          ;; ;;:sitemap-file-entry-format "%t" ; %d to output date, we don't need date here
+          ;; )
+          ;;("org-51xny-static"
+          ;; :base-directory "~/workspace/org/blog"
+          ;; :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf|doc"
+          ;; :publishing-directory "~/workspace/org/blog/publish"
+          ;; :recursive t
+          ;; :publishing-function org-publish-attachment
+          ;; )
+          ;;("org-51xny" :components ("org-51xny-notes" "org-51xny-static"))
+          )
+        )
+
+  ;; org-crypt
+  ;;(require-package 'org-crypt)
+  (require 'org-crypt)
+
+  ;; 當被加密的部份要存入硬碟時，自動加密回去
+  (org-crypt-use-before-save-magic)
+
+  ;; 設定要加密的 tag 標籤為 secret
+  (setq org-crypt-tag-matcher "secret")
+
+  ;; 避免 secret 這個 tag 被子項目繼承 造成重複加密
+  ;; (但是子項目還是會被加密喔)
+  (setq org-tags-exclude-from-inheritance (quote ("secret")))
+
+  ;; 用於加密的 GPG 金鑰
+  ;; 可以設定任何 ID 或是設成 nil 來使用對稱式加密 (symmetric encryption)
+  (setq org-crypt-key "393B76F8FD82DC7B7A5E79AB3251A10218FB9FDB")
+  ;;(setq org-crypt-key "nil")
+
+
+  ;; js文件格式设置
+  (setq-default js2-basic-offset 2)
+  (setq-default js-indent-level 2)
+
   (boundp 'column-number-indicator-zero-based)
   ;; (setq powerline-default-separator 'slant)
   (setq powerline-default-separator 'arrow)
-
-  ;; font
-  (setq-default dotspacemacs-default-font '("Source Code Pro"
-                                            :size 13
-                                            :weight normal
-                                            :width normal
-                                            :powerline-scale 1.1))
 
   ;;mu4e
   (setq mu4e-maildir "~/mail"
@@ -438,8 +908,7 @@ you should place your code here."
                  (nnimap-server-port "imaps")
                  (nnimap-stream ssl)))
 
-  (setq smtpmail-smtp-server "imap.mxhichin
-a.com"
+  (setq smtpmail-smtp-server "imap.mxhichina.com"
         smtpmail-smtp-service 587
         gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
@@ -485,37 +954,70 @@ a.com"
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(custom-enabled-themes (quote (spacemacs-dark)))
+ '(ansi-color-names-vector
+   ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCCC"])
+ '(blink-cursor-mode nil)
+ '(column-number-mode t)
+ '(company-quickhelp-color-background "#4F4F4F")
+ '(company-quickhelp-color-foreground "#DCDCCC")
+ '(compilation-message-face (quote default))
  '(custom-safe-themes
    (quote
-    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
+    ("bd7b7c5df1174796deefce5debc2d976b264585d51852c962362be83932873d9" "ec5f697561eaf87b1d3b087dd28e61a2fc9860e4c862ea8e6b0b77bd4967d0ba" default)))
  '(evil-want-Y-yank-to-eol nil)
- '(org-agenda-custom-commands
+ '(fci-rule-color "#383838" t)
+ '(highlight-changes-colors (quote ("#ff8eff" "#ab7eff")))
+ '(highlight-tail-colors
    (quote
-    (("w" . "任务安排")
-     ("wa" "重要且紧急的任务" tags-todo "+PRIORITY=\"A\"" nil)
-     ("wb" "重要且不紧急的任务" tags-todo "-Weekly-Monthly-Daily+PRIORITY=\"B\"" nil)
-     ("wc" "不重要且紧急的任务" tags-todo "+PRIORITY=\"C\"" nil)
-     ("wd" "不重要且不紧急的任务" tags-todo "+PRIORITY=\"D\"" nil)
-     ("b" "Blog" tags-todo "BLOG" nil)
-     ("p" . "项目安排")
-     ("pw" "hitu" tags-todo "PROJECT+WORK+CATEGORY=\"hitu\"" nil)
-     ("pl" "willeam" tags-todo "PROJECT+DREAM+CATEGORY=\"willeam\"" nil)
-     ("W" "Weekly Review"
-      ((stuck "" nil)
-       (tags-todo "PROJECT" nil))
-      nil))) t)
- '(org-agenda-files
+    (("#424748" . 0)
+     ("#63de5d" . 20)
+     ("#4BBEAE" . 30)
+     ("#1DB4D0" . 50)
+     ("#9A8F21" . 60)
+     ("#A75B00" . 70)
+     ("#F309DF" . 85)
+     ("#424748" . 100))))
+ '(magit-diff-use-overlays nil)
+ '(nrepl-message-colors
    (quote
-    ("~/org/gtd.org" "~/org/notes.org" "~/org/books.org" "~/org/journal.org")))
+    ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(package-selected-packages
    (quote
-    (xterm-color web-beautify tagedit smeargle slim-mode shell-pop scss-mode sass-mode pug-mode orgit xml-rpc org-category-capture org-present org-pomodoro org-download mwim multi-term mu4e-maildirs-extension mu4e-alert alert log4e gntp magit-gitflow magit-gh-pulls livid-mode simple-httpd json-snatcher json-reformat js-doc htmlize parent-mode helm-gitignore helm-css-scss helm-company helm-c-yasnippet gnuplot gitignore-mode github-search github-clone github-browse-file gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gist gh marshal logito pcache ht gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flx git-commit iedit anzu goto-chg eshell-z emmet-mode company-web web-completion-data company-tern dash-functional tern company-statistics coffee-mode blog-admin names ctable bind-map bind-key auto-yasnippet auto-dictionary packed ac-ispell auto-complete popup pkg-info epl f org-mime phpunit phpcbf php-extras php-auto-yasnippets drupal-mode php-mode yaml-mode unfill org-projectile eshell-prompt-extras engine-mode pyim pyim-basedict projectile multiple-cursors hydra web-mode powerline org2blog metaweblog markdown-toc markdown-mode json-mode js2-refactor hexo gitconfig-mode fcitx evil-magit esh-help diminish diff-hl highlight smartparens evil undo-tree flycheck yasnippet company helm helm-core avy skewer-mode js2-mode magit magit-popup with-editor async haml-mode dash s rainbow-mode rainbow-identifiers color-identifiers-mode reveal-in-osx-finder pbcopy osx-trash osx-dictionary launchctl ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
+    (cnfonts chinese-word-at-point mmt restclient-helm ob-restclient ob-http ham-mode html-to-markdown fringe-helper git-gutter+ git-gutter pos-tip flycheck company-restclient restclient know-your-http-well names ctable pinyinlib wakatime-mode define-word zenburn-theme zen-and-art-theme youdao-dictionary yaml-mode xterm-color ws-butler winum white-sand-theme which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme typit twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit sunny-day-theme sudoku sublime-themes subatomic256-theme subatomic-theme spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs rebecca-theme rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme pug-mode professional-theme popwin planet-theme phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode pcre2el pbcopy paradox pangu-spacing pacmacs osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-mime org-mac-link org-download org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nginx-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-maildirs-extension mu4e-alert move-text monokai-theme monochrome-theme molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc majapahit-theme magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode linum-relative link-hint light-soap-theme launchctl json-mode js2-refactor js-doc jbeans-theme jazz-theme ir-black-theme inkpot-theme indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hexo heroku-theme hemisu-theme helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gtags helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio gnuplot gmail-message-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-helm flymd flycheck-pos-tip flx-ido flatui-theme flatland-theme find-by-pinyin-dired fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-yt erc-view-log erc-terminal-notifier erc-social-graph erc-image erc-hl-nicks engine-mode emmet-mode elisp-slime-nav edit-server dumb-jump drupal-mode dracula-theme django-theme diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme company-web company-tern company-statistics column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clues-theme clean-aindent-mode chinese-wbim cherry-blossom-theme busybee-theme bubbleberry-theme blog-admin birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell 2048-game)))
+ '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
+ '(pos-tip-background-color "#E6DB74")
+ '(pos-tip-foreground-color "#242728")
+ '(tool-bar-mode nil)
+ '(vc-annotate-background "#2B2B2B")
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#BC8383")
+     (40 . "#CC9393")
+     (60 . "#DFAF8F")
+     (80 . "#D0BF8F")
+     (100 . "#E0CF9F")
+     (120 . "#F0DFAF")
+     (140 . "#5F7F5F")
+     (160 . "#7F9F7F")
+     (180 . "#8FB28F")
+     (200 . "#9FC59F")
+     (220 . "#AFD8AF")
+     (240 . "#BFEBBF")
+     (260 . "#93E0E3")
+     (280 . "#6CA0A3")
+     (300 . "#7CB8BB")
+     (320 . "#8CD0D3")
+     (340 . "#94BFF3")
+     (360 . "#DC8CC3"))))
+ '(vc-annotate-very-old-color "#DC8CC3")
+ '(wakatime-python-bin nil)
+ '(weechat-color-list
+   (unspecified "#242728" "#424748" "#F70057" "#ff0066" "#86C30D" "#63de5d" "#BEB244" "#E6DB74" "#40CAE4" "#06d8ff" "#FF61FF" "#ff8eff" "#00b2ac" "#53f2dc" "#f8fbfc" "#ffffff")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:family "Source Code Pro" :foundry "nil" :slant normal :weight normal :height 130 :width normal))))
+ '(mode-line ((t (:foreground "#fff" :background "#444" :box nil))))
+ '(mode-line-inactive ((t (:foreground "#d0d0d0" :background "#666666" :box nil)))))
