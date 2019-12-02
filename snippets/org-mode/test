@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+#name : start region
+#key : sr
+# --
+# region $0

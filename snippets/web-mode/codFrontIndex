@@ -1,0 +1,258 @@
+# -*- mode: snippet -*-
+# name: codFrontIndex
+# key: CFI
+# --
+
+<title>$0管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>$1管理</cite></a>
+        <a><cite>$2管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="COD-dict-query">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">查询条件</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="$3" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="$5COD-dict-front-search">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn cod-dict-btn" data-type="batchdel">删除</button>
+                <button class="layui-btn cod-dict-btn" data-type="add">添加</button>
+            </div>
+
+            <table id="COD-dict-list" lay-filter="COD-$6-list"></table>
+            <script type="text/html" id="table-$7-menu">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+                    <i class="layui-icon layui-icon-edit"></i>编辑
+                </a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+                    <i class="layui-icon layui-icon-delete"></i>删除
+                </a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script>
+	layui.use('dict', layui.factory('dict')).use(['admin', 'form', 'dict', 'table', 'setter'], function () {
+		var $ = layui.$,
+			admin = layui.admin,
+			view = layui.view,
+			table = layui.table,
+			setter = layui.setter,
+			form = layui.form;
+
+		form.render(null, 'COD-$8-query');
+
+		//监听搜索
+		form.on('submit(COD-$9-front-search)', function (data) {
+			var field = data.field;
+
+			//执行重载
+			table.reload('COD-$10-list', {
+				where: field
+			});
+		});
+
+        // 字典类型管理
+		table.render({
+			elem: '#COD-$11-list',
+			url: setter.requestUrl + '$12',
+			cols: [[
+				{type: 'checkbox'},
+				{field: 'typeName', title: '类型名称', sort: true},
+				{field: 'typeCode', title: '类型代码', sort: true},
+				{field: 'allPin', title: '全拼', sort: true},
+				{field: 'englishName', title: '英文名称' },
+				{
+					field: 'typeStatus', title: '类型状态', width: "10%", sort: true, templet: function (d) {
+						return d.typeStatus === '1' ? "启用" : "禁用"
+					}
+				},
+				{title: '操作', align: 'center', fixed: 'right', toolbar: '#table-$13-menu'}
+			]],
+            response: {
+                statusName: 'code', //规定数据状态的字段名称，默认：code
+                statusCode: '1111'
+            },
+			// 返回
+			parseData: function (res) {
+                if (res.code == "1111"){
+                    return {
+                        "code": res.code,
+                        "count": res.data.p.total,
+                        "data": res.data.data,
+                    };
+                }
+                if (res.code == "1001"){
+                    location.hash = "/user/login";
+                }
+			},
+			page: true,
+			limit: 30,
+			height: 'full-320',
+			text: {
+				none: "暂无相关数据!"
+			}
+		});
+
+		//监听工具条
+		table.on('tool(COD-dict-list)', function (obj) {
+			var data = obj.data;
+      // 删除
+			if (obj.event === 'del') {
+				// location.hash = "/system/menu/menuform";
+				layer.confirm('真的删除菜单吗?', function (index) {
+					console.log(obj);
+					admin.req({
+						url: setter.requestUrl + 'system/dict/delDictType',
+						type: "post",
+						data: {"id": data.id},
+						done: function(res){
+							console.log(res);
+							obj.del();
+							layer.close(index);
+						}
+					});
+				});
+			}
+
+      // 修改
+			if (obj.event === 'edit') {
+				var id = data.id;
+				// location.hash = "/system/menu/menuform/menuId=" + id;
+				admin.popup({
+					title: '添加字典类型',
+					area: ['450px', '600px'],
+					id: 'COD-dict-type-add',
+					success: function (layero, index) {
+						console.log(index);
+						view(this.id).render('/system/dict/addType', data).done(function () {
+							form.render();
+							//监听提交
+							/*form.on('submit(LAY-menu-select-menu)', function (data) {
+                                var field = data.field; //获取提交的字段
+                                console.log(index);
+                                //提交 Ajax 成功后，关闭当前弹层并重载表格
+                                //$.ajax({});
+                                layui.table.reload('LAY-menu-manage'); //重载表格
+                                layer.close(index); //执行关闭
+                            });*/
+
+							form.on('submit(COD-dict-addDictType)', function (data) {
+								console.log(data);
+								var field = data.field; //获取提交的字段
+								//请求接口
+								admin.req({
+									url: setter.requestUrl + 'system/menu/saveMenu',
+									type: "post",
+									data: field,
+									done: function(res){
+										console.log(res);
+										layer.msg("保存成功",{
+											time: 2000
+										}, function () {
+											layui.table.reload('LAY-menu-manage'); //重载表格
+											layer.close(index); //执行关闭
+										});
+										// form.render();
+									}
+								});
+							});
+
+							// 返回
+							$("#COD-dict-backDictType").on("click", function () {
+								layer.confirm('确定返回吗？您的数据将丢失!', function (index1) {
+									// location.hash = "/system/menu/index";
+									layer.close(index1);
+									layer.close(index);
+								});
+							});
+						});
+					}
+				});
+				// form.render();
+			}
+		});
+
+		var active = {
+			// 删除
+            batchdel: function() {
+
+            },
+            // 添加
+            add: function () {
+                admin.popup({
+		            title: '添加字典',
+		            area: ['450px', '600px'],
+		            id: 'COD-dict-type-add',
+		            success: function (layero, index) {
+			            view(this.id).render('/system/dict/addType').done(function () {
+				            form.render();
+
+				            //监听提交
+				            form.on('submit(COD-dict-addDictType)', function (data) {
+					            var field = data.field; //获取提交的字段
+					            //请求接口
+					            admin.req({
+						            url: setter.requestUrl + 'system/dict/saveDictType',
+						            type: "post",
+						            data: field,
+						            done: function(res){
+							            console.log(res);
+							            layer.msg("保存成功",{
+								            time: 2000
+							            }, function () {
+								            layui.table.reload('COD-dict-list'); //重载表格
+								            layer.close(index); //执行关闭
+							            });
+							            // form.render();
+						            }
+					            });
+				            });
+
+				            // 返回
+				            $("#LAY-menu-back").on("click", function () {
+					            layer.confirm('确定返回吗？您的数据将丢失!', function (index1) {
+						            // location.hash = "/system/menu/index";
+						            layer.close(index1);
+						            layer.close(index);
+					            });
+				            });
+
+				            // 选择上级菜单
+				            $('#LAY-menu-select-prev-menu').on('click', function () {
+					            var type = $(this).data('type');
+					            console.log(type);
+					            active[type] ? active[type].call(this) : '';
+				            });
+
+			            });
+		            }
+	            });
+            }
+        };
+
+		$('.layui-btn.cod-dict-btn').on('click', function () {
+			var type = $(this).data('type');
+			active[type] ? active[type].call(this) : '';
+		});
+	});
+</script>

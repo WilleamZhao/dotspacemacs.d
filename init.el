@@ -97,8 +97,9 @@ values."
      ;; spaceline-compile
      ;; blog-admin
      (chinese :variables
-              chinese-default-input-method 'wubi
+              chinese-default-input-method 'pinyin
               chinese-enable-youdao-dict t
+              chinese-enable-fcitx t
               )
 
      gtags
@@ -122,8 +123,8 @@ values."
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(
-                                      cnfonts
-                                      )
+                                      ;; cnfonts
+                                     )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -210,8 +211,10 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 16
+   dotspacemacs-default-font '(;;"楷体"
+                               "Source Code Pro"
+                               :size 14
+                               ;; :family "楷体"
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -397,6 +400,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (setq-default git-magit-status-fullscreen t)
   (setq-default git-enable-magit-svn-plugin t)
   ;; (setq-default dotspacemacs-themes '(solarized-light leuven zenburn))
+
   )
 
 (defun dotspacemacs/user-config ()
@@ -406,6 +410,96 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+  ;;(defun spacemacs//set-monospaced-font (english chinese english-size chinese-size)
+  ;; (set-face-attribute 'default nil :font
+  ;;                      (format   "%s:pixelsize=%d"  english english-size))
+  ;;  (dolist (charset '(kana han cjk-misc bopomofo))
+  ;;    (set-fontset-font (frame-parameter nil 'font) charset
+  ;;                      (font-spec :family chinese :size chinese-size))))
+
+  ;; 解决org表格里面中英文对齐的问题
+  ;;(when (configuration-layer/layer-usedp 'chinese)
+  ;;  (when (and (spacemacs/system-is-mac) window-system)
+  ;;    (spacemacs//set-monospaced-font "Source Code Pro" "楷体" 14 16)
+  ;;    ))
+
+  ;; 设置默认字体14 设置中文字体16 效果一样
+  (dolist (charset '(kana han cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font) charset
+                      (font-spec :family "楷体" :size 16)))
+
+
+  ;;(require 'cnfonts)
+  ;; 让 cnfonts 随着 Emacs 自动生效。
+  ;;(cnfonts-enable)
+
+  ;; 让 spacemacs mode-line 中的 Unicode 图标正确显示。
+  ;;(cnfonts-set-spacemacs-fallback-fonts)
+
+  ;; Setting Chinese Font
+
+  ;; password
+  (defun random-alphanum ()
+    (let* ((charset "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()")
+           (x (random 46)))
+      (char-to-string (elt charset x))))
+
+  ;; 创建密码for org-capture
+  (defun create-password-org-capture ()
+    (let ((value ""))
+    (dotimes (number 16 value)
+      (setq value (concat value (random-alphanum))))))
+
+  (defun create-password ()
+    "create-password function, create 16 password"
+    (interactive)
+    (insert (create-password-org-capture))
+    )
+
+  (defun get-or-create-password ()
+    (setq password (read-string "Password: "))
+    (if (string= password "")
+        (create-password-org-capture)
+      password))
+
+  ;; epa-start
+  ;;(setq epg-gpg-program "/usr/local/bin/gpg")
+  (require 'epa-file)
+  (epa-file-enable)
+  ;; 脚本位置
+  (custom-set-variables '(epg-gpg-program "/usr/local/bin/gpg"))
+  ;; 总是使用对称加密
+  (setq epa-file-encrypt-to "393B76F8FD82DC7B7A5E79AB3251A10218FB9FDB")
+  
+  ;; 允许缓存密码，否则编辑时每次保存都要输入密码
+  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+  ;; 不用每次都提醒
+  (setq epa-file-select-keys 0)
+  ;; 禁用自动保存
+  (setq epa-file-inhibit-auto-save t)
+  ;; home
+  (setq epg-gpg-home-directory "/Users/sourcod/.gnupg/")
+  
+  ;; emacs内部输入密码
+  (setq epa-pinentry-mode 'loopback)
+  
+  ;; Do not use gpg agent when runing in terminal
+  (defadvice epg--start (around advice-epg-disable-agent activate)
+    (let ((agent (getenv "GPG_AGENT_INFO")))
+      (when (not (display-graphic-p))
+        (setenv "GPG_AGENT_INFO" nil))
+      ad-do-it
+      (when (not (display-graphic-p))
+        (setenv "GPG_AGENT_INFO" agent))))
+
+  (ad-enable-advice 'epg--start 'around 'advice-epg-disable-agent)
+  (ad-activate 'epg--start)
+
+  ;; kill emacs after kill gpg-agent
+  (add-hook 'kill-emacs-hook (defun personal--kill-gpg-agent ()
+                             (shell-command "pkill gpg-agent")))
+
   ;; chrome
   (add-hook 'edit-server-start-hook 'markdown-mode)
   (add-hook 'edit-server-done-hook (lambda () (shell-command "open -a \"Google Chrome\"")))
@@ -423,6 +517,7 @@ you should place your code here."
   (setq neo-show-hidden-files nil)
   (setq neo-smart-open t)
   (global-set-key [f2] 'neotree-toggle)
+  (global-set-key [f3] 'neotree-show)
 
   (defun neotree-ffip-project-dir ()
     "Open NeoTree using the git root."
@@ -434,6 +529,7 @@ you should place your code here."
             (neotree-dir project-dir)
             (neotree-find file-name))
         (message "Could not find git project root."))))
+  ;; (define-key map (kbd "C-c C-p") 'neotree-ffip-project-dir)
 
   ;; time-mode
   (setq display-time-24hr-format t
@@ -449,6 +545,7 @@ you should place your code here."
   ;; Shorter modeline
   (setq-default projectile-mode-line-prefix " Proj")
   (global-set-key (kbd "C-c C-p") 'projectile-switch-project)
+  ;;(define-key projectile-mode-map (kbd "C-x p") 'projectile-switch-project)
 
   ;; magit
   (setq magit-repository-directories '("~/.spacemacs.d/repos/magit/"))
@@ -470,10 +567,7 @@ you should place your code here."
                                  ("DONE" . (:foreground "white" :background "#3498DB" :weight bold))))
 
   ;; 等宽字体
-  ;;解决org表格里面中英文对齐的问题
-  ;;(when (configuration-layer/layer-usedp 'chinese)
-  ;;(when (and (spacemacs/system-is-mac) window-system)
-  ;;(spacemacs//set-monospaced-font "Source Code Pro" "Hiragino Sans GB" 14 16)))
+  
 
   ;; org
   ;; 多状态工作流程
@@ -826,6 +920,7 @@ you should place your code here."
   ;; 設定要加密的 tag 標籤為 secret
   (setq org-crypt-tag-matcher "secret")
 
+
   ;; 避免 secret 這個 tag 被子項目繼承 造成重複加密
   ;; (但是子項目還是會被加密喔)
   (setq org-tags-exclude-from-inheritance (quote ("secret")))
@@ -941,10 +1036,17 @@ you should place your code here."
   ;; use American English as ispell default dictionary
   (ispell-change-dictionary "american" t)
 
+
+
+
   ;; (require ’pyim)
   ;; (require ’pyim-basedict)
   ;; (pyim-basedict-enable)
   ;; (setq default-input-method "pyim")
+
+  ;; 关闭indent－mode
+  (electric-indent-mode -1)
+  ;; (add-hook web-mode-hook (lambda () (electric-indent-local-mode -1)))
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -964,6 +1066,7 @@ you should place your code here."
  '(custom-safe-themes
    (quote
     ("bd7b7c5df1174796deefce5debc2d976b264585d51852c962362be83932873d9" "ec5f697561eaf87b1d3b087dd28e61a2fc9860e4c862ea8e6b0b77bd4967d0ba" default)))
+ '(epg-gpg-program "/usr/local/bin/gpg")
  '(evil-want-Y-yank-to-eol nil)
  '(fci-rule-color "#383838" t)
  '(highlight-changes-colors (quote ("#ff8eff" "#ab7eff")))
@@ -983,10 +1086,13 @@ you should place your code here."
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(package-selected-packages
    (quote
-    (cnfonts chinese-word-at-point mmt restclient-helm ob-restclient ob-http ham-mode html-to-markdown fringe-helper git-gutter+ git-gutter pos-tip flycheck company-restclient restclient know-your-http-well names ctable pinyinlib wakatime-mode define-word zenburn-theme zen-and-art-theme youdao-dictionary yaml-mode xterm-color ws-butler winum white-sand-theme which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme typit twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit sunny-day-theme sudoku sublime-themes subatomic256-theme subatomic-theme spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs rebecca-theme rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme pug-mode professional-theme popwin planet-theme phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode pcre2el pbcopy paradox pangu-spacing pacmacs osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-mime org-mac-link org-download org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nginx-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-maildirs-extension mu4e-alert move-text monokai-theme monochrome-theme molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc majapahit-theme magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode linum-relative link-hint light-soap-theme launchctl json-mode js2-refactor js-doc jbeans-theme jazz-theme ir-black-theme inkpot-theme indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hexo heroku-theme hemisu-theme helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gtags helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio gnuplot gmail-message-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-helm flymd flycheck-pos-tip flx-ido flatui-theme flatland-theme find-by-pinyin-dired fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-yt erc-view-log erc-terminal-notifier erc-social-graph erc-image erc-hl-nicks engine-mode emmet-mode elisp-slime-nav edit-server dumb-jump drupal-mode dracula-theme django-theme diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme company-web company-tern company-statistics column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clues-theme clean-aindent-mode chinese-wbim cherry-blossom-theme busybee-theme bubbleberry-theme blog-admin birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell 2048-game)))
+    (fcitx mmt restclient-helm ob-restclient ob-http ham-mode html-to-markdown fringe-helper git-gutter+ git-gutter pos-tip flycheck company-restclient restclient know-your-http-well names ctable pinyinlib wakatime-mode define-word zenburn-theme zen-and-art-theme youdao-dictionary yaml-mode xterm-color ws-butler winum white-sand-theme which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen use-package unfill underwater-theme ujelly-theme typit twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit sunny-day-theme sudoku sublime-themes subatomic256-theme subatomic-theme spaceline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs rebecca-theme rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme pug-mode professional-theme popwin planet-theme phpunit phpcbf php-extras php-auto-yasnippets phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode pcre2el pbcopy paradox pangu-spacing pacmacs osx-trash osx-dictionary orgit organic-green-theme org2blog org-projectile org-present org-pomodoro org-mime org-mac-link org-download org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme nginx-mode neotree naquadah-theme mwim mustang-theme multi-term mu4e-maildirs-extension mu4e-alert move-text monokai-theme monochrome-theme molokai-theme moe-theme mmm-mode minimal-theme material-theme markdown-toc majapahit-theme magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode linum-relative link-hint light-soap-theme launchctl json-mode js2-refactor js-doc jbeans-theme jazz-theme ir-black-theme inkpot-theme indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hexo heroku-theme hemisu-theme helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gtags helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio gnuplot gmail-message-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md ggtags gandalf-theme fuzzy flyspell-correct-helm flymd flycheck-pos-tip flx-ido flatui-theme flatland-theme find-by-pinyin-dired fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help erc-yt erc-view-log erc-terminal-notifier erc-social-graph erc-image erc-hl-nicks engine-mode emmet-mode elisp-slime-nav edit-server dumb-jump drupal-mode dracula-theme django-theme diminish diff-hl darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme company-web company-tern company-statistics column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode coffee-mode clues-theme clean-aindent-mode chinese-wbim cherry-blossom-theme busybee-theme bubbleberry-theme blog-admin birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell 2048-game)))
  '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
  '(pos-tip-background-color "#E6DB74")
  '(pos-tip-foreground-color "#242728")
+ '(safe-local-variable-values
+   (quote
+    ((ffip-project-root . "/Users/sourcod/workspace/org/"))))
  '(tool-bar-mode nil)
  '(vc-annotate-background "#2B2B2B")
  '(vc-annotate-color-map
